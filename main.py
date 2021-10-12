@@ -176,9 +176,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=5e-4)
 optimizer = optim.Adam(net.parameters(), lr=0.001)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 for epoch in range(start_epoch, start_epoch+200):
     train(epoch, netkey)
     test(epoch, netkey)
-    scheduler.step()
+    # scheduler.step()
