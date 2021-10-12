@@ -336,11 +336,22 @@ def CLNet_V11_bn(num_classes):
     return CLNET_bn(cfg, num_classes=num_classes)
 
 
+def CLNet_V12_bn(num_classes):
+    cfg = {
+        'out_channels': [24, 24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
+        'kernel_size': [(3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3), (3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3)],
+        'pool_enable': [False, False, True, False, True, False, False, False, True, True, False, False],
+        'dropout_rate': 0.2,
+        'group_size' : [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    }
+    return CLNET_bn(cfg, num_classes=num_classes)
+
+
 import torchinfo
 
 
 def test():
-    net = CLNet_V11_bn(10)
+    net = CLNet_V12_bn(10)
     torchinfo.summary(net, (1, 3, 32, 32))
     x = torch.randn(3, 3, 224, 224, device='cuda')
     y = net(x)

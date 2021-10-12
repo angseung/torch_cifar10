@@ -14,7 +14,7 @@ import os
 import argparse
 
 from models import *
-from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V11_bn
+from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
 from utils import progress_bar
 
 
@@ -74,7 +74,7 @@ print('==> Building model..')
 # net = SimpleDLA()
 # net = CLNet_V10(10)
 # net = CLNet_V11(10)
-net = CLNet_V11_bn(10)
+net = CLNet_V12_bn(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
