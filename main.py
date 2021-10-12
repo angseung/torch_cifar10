@@ -16,11 +16,12 @@ import argparse
 from models import *
 from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
 from models.clnet import CLNet_V0
-from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw
+from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw, CLNetV1_C1B3_sw
 from utils import progress_bar
 import time
 
 
+timestr = time.strftime("%Y%m%d-%H%M%S")
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true',
@@ -78,8 +79,9 @@ print('==> Building model..')
 # net = CLNet_V10(10)
 # net = CLNet_V11(10)
 # net = CLNet_V12_bn(10)
-net = CLNetV1_C1B1_sw(10)
+# net = CLNetV1_C1B1_sw(10)
 # net = CLNetV1_C1B2_sw(10)
+net = CLNetV1_C1B3_sw(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
@@ -99,7 +101,7 @@ if args.resume:
 log_path = 'outputs/' + netkey
 os.makedirs(log_path, exist_ok=True)
 
-with open(log_path + '/log.txt', 'w') as f:
+with open(log_path + '/log_%s.txt' %timestr, 'w') as f:
     f.write('Networks : %s\n' % netkey)
     m_info = str(summary(net, (1, 3, 32, 32), verbose=0))
     f.write('%s\n\n' % m_info)
@@ -170,7 +172,6 @@ def test(epoch, dir_path=None, fname=None):
         f.write('|Test| Loss: %.3f, Acc: %.3f \n' % (test_loss / (batch_idx + 1), acc))
 
 
-timestr = time.strftime("%Y%m%d-%H%M%S")
 criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=args.lr,
 #                       momentum=0.9, weight_decay=5e-4)
@@ -178,9 +179,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=5e-4)
 optimizer = optim.Adam(net.parameters(), lr=0.001)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
-# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 for epoch in range(start_epoch, start_epoch+200):
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
-    # scheduler.step()
+    scheduler.step()
