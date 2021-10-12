@@ -16,6 +16,7 @@ import argparse
 from models import *
 from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
 from models.clnet import CLNet_V0
+from models.clnetv2 import CLNetV1_C1B1_sw
 from utils import progress_bar
 
 
@@ -76,7 +77,7 @@ print('==> Building model..')
 # net = CLNet_V10(10)
 # net = CLNet_V11(10)
 # net = CLNet_V12_bn(10)
-net = CLNet_V0(10)
+net = CLNetV1_C1B1_sw(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
@@ -172,8 +173,8 @@ criterion = nn.CrossEntropyLoss()
 #                       momentum=0.9, weight_decay=5e-4)
 # optimizer = optim.SGD(net.parameters(), lr=1e-2)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=5e-4)
-# optimizer = optim.Adam(net.parameters())
-optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
+optimizer = optim.Adam(net.parameters(), lr=0.001)
+# optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 for epoch in range(start_epoch, start_epoch+200):
