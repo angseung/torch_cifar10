@@ -18,6 +18,7 @@ from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
 from models.clnet import CLNet_V0
 from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw
 from utils import progress_bar
+import time
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -77,8 +78,8 @@ print('==> Building model..')
 # net = CLNet_V10(10)
 # net = CLNet_V11(10)
 # net = CLNet_V12_bn(10)
-# net = CLNetV1_C1B1_sw(10)
-net = CLNetV1_C1B2_sw(10)
+net = CLNetV1_C1B1_sw(10)
+# net = CLNetV1_C1B2_sw(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
@@ -104,7 +105,7 @@ with open(log_path + '/log.txt', 'w') as f:
     f.write('%s\n\n' % m_info)
 
 # Training
-def train(epoch, dir_path = None):
+def train(epoch, dir_path = None, fname=None):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
@@ -126,12 +127,12 @@ def train(epoch, dir_path = None):
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
-    with open('outputs/' + dir_path + '/log.txt', 'a') as f:
+    with open('outputs/' + dir_path + '/log_%s.txt' %fname, 'a') as f:
         f.write('Epoch [%d] |Train| Loss: %.3f, Acc: %.3f \t' % (
             epoch, train_loss / (batch_idx + 1), 100. * correct / total))
 
 
-def test(epoch, dir_path=None):
+def test(epoch, dir_path=None, fname=None):
     global best_acc
     net.eval()
     test_loss = 0
@@ -165,10 +166,11 @@ def test(epoch, dir_path=None):
         torch.save(state, './checkpoint/ckpt.pth')
         best_acc = acc
 
-    with open('outputs/' + dir_path + '/log.txt', 'a') as f:
+    with open('outputs/' + dir_path + '/log_%s.txt' %fname, 'a') as f:
         f.write('|Test| Loss: %.3f, Acc: %.3f \n' % (test_loss / (batch_idx + 1), acc))
 
 
+timestr = time.strftime("%Y%m%d-%H%M%S")
 criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=args.lr,
 #                       momentum=0.9, weight_decay=5e-4)
@@ -179,6 +181,6 @@ optimizer = optim.Adam(net.parameters(), lr=0.001)
 # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch, netkey)
-    test(epoch, netkey)
+    train(epoch, netkey, timestr)
+    test(epoch, netkey, timestr)
     # scheduler.step()
