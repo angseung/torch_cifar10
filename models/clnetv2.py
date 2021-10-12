@@ -190,6 +190,19 @@ def CLNetV1_C1B1_sw(num_classes):
     return CLNET(cfg, num_classes=num_classes)
 
 
+def CLNetV1_C1B2_sw(num_classes):
+    cfg = {
+        'out_channels': [24, 24, 40, 40, 40, 80, 80, 80, 80, 112, 112, 160, 160, 160, 320],
+        'kernel_size': [(3, 3)] * 15,
+        'pool_enable': [False, True, False, False, True, False, False, False, False, True, False, True, False, False,
+                        False],
+        'pgroup': [2]*15,
+        'shortcut_enable': [True]*15,
+        'dropout_rate': 0.2
+    }
+    return CLNET(cfg, num_classes=num_classes)
+
+
 import torchinfo
 
 

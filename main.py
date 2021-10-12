@@ -16,7 +16,7 @@ import argparse
 from models import *
 from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
 from models.clnet import CLNet_V0
-from models.clnetv2 import CLNetV1_C1B1_sw
+from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw
 from utils import progress_bar
 
 
@@ -77,7 +77,8 @@ print('==> Building model..')
 # net = CLNet_V10(10)
 # net = CLNet_V11(10)
 # net = CLNet_V12_bn(10)
-net = CLNetV1_C1B1_sw(10)
+# net = CLNetV1_C1B1_sw(10)
+net = CLNetV1_C1B2_sw(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
