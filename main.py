@@ -19,6 +19,16 @@ from models.clnet import CLNet_V0
 from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw, CLNetV1_C1B3_sw
 from utils import progress_bar
 import time
+import random
+
+random_seed = 1
+torch.manual_seed(random_seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+np.random.seed(random_seed)
+random.seed(random_seed)
+torch.cuda.manual_seed(random_seed)
+torch.cuda.manual_seed_all(random_seed) # multi-GPU
 
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -178,7 +188,7 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=1e-2)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=5e-4)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=1e-3)
-optimizer = optim.Adam(net.parameters(), lr=0.0025)
+optimizer = optim.Adam(net.parameters(), lr=0.001)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
