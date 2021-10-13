@@ -206,7 +206,7 @@ def CLNetV1_C1B2_sw(num_classes):
 def CLNetV1_C1B3_sw(num_classes):
     cfg = {
         'out_channels': [24, 24, 24, 40, 40, 40, 80, 80, 80, 80, 112, 112, 160, 160, 160, 320],
-        'kernel_size': [(5, 3), (3, 5)] * 8,
+        'kernel_size': [(5, 3), (3, 5), (5, 5), (3, 3)] * 4,
         'pool_enable': [False, False, True, False, False, True, False, False, False, False, True, False, True, False, False,
                         False],
         'pgroup': [2]*16,
