@@ -80,9 +80,9 @@ class SparseCrossLinkBlock(nn.Module):
     def forward(self, x):
         '''add forward here'''
 
-        x = self.pconv0(x)
-        out1 = self.dconv1(x)
-        out2 = self.dconv2(x) # 0.1 or 0.01
+        x1 = self.pconv0(x)
+        out1 = self.dconv1(x1)
+        out2 = self.dconv2(x1) # 0.1 or 0.01
         out = out2 * torch.sigmoid(out1) + out1 * torch.sigmoid(out2)
         # out = shuffle
         out = self.bn(self.pconv1(out))
