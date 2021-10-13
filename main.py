@@ -25,7 +25,6 @@ random_seed = 1
 torch.manual_seed(random_seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
-np.random.seed(random_seed)
 random.seed(random_seed)
 torch.cuda.manual_seed(random_seed)
 torch.cuda.manual_seed_all(random_seed) # multi-GPU
@@ -182,6 +181,7 @@ def test(epoch, dir_path=None, fname=None):
         f.write('|Test| Loss: %.3f, Acc: %.3f \n' % (test_loss / (batch_idx + 1), acc))
 
 
+max_epoch = 200
 criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=args.lr,
 #                       momentum=0.9, weight_decay=5e-4)
@@ -190,9 +190,10 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=1e-3)
 optimizer = optim.Adam(net.parameters(), lr=0.001)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
-for epoch in range(start_epoch, start_epoch+200):
+
+for epoch in range(start_epoch, start_epoch + max_epoch):
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
     scheduler.step()
