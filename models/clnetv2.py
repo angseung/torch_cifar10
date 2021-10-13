@@ -68,13 +68,14 @@ class SparseCrossLinkBlock(nn.Module):
 
         self.maxpool = nn.MaxPool2d(2, 2)
 
+
     def forward(self, x):
         '''add forward here'''
 
         out1 = self.dconv1(x)
         out2 = self.dconv2(x)
-        out = out2 * F.sigmoid(out1) + out1 * F.sigmoid(out2)
-        out = F.tanh(out)
+        out = out2 * torch.sigmoid(out1) + out1 * torch.sigmoid(out2)
+        out = torch.tanh(out)
         out = self.bn(self.pconv1(out))
 
         if self.shortcut_enable:
@@ -212,7 +213,7 @@ def CLNetV1_C1B3_sw(num_classes):
                         False],
         'pgroup': [2]*16,
         'shortcut_enable': [True]*16,
-        'dropout_rate': 0.5
+        'dropout_rate': 0.2
     }
     return CLNET(cfg, num_classes=num_classes)
 
