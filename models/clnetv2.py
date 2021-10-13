@@ -32,6 +32,14 @@ class SparseCrossLinkBlock(nn.Module):
         self.shortcut_enable = shortcut_enable
 
         # basic blocks
+        self.pconv0 = nn.Conv2d(in_channels,
+                                in_channels,
+                                kernel_size=1,
+                                stride=1,
+                                padding=0,
+                                groups=pgroup,
+                                bias=False)
+
         self.dconv1 = nn.Conv2d(in_channels,
                                 in_channels,
                                 kernel_size=kernel_size[0],
@@ -72,6 +80,7 @@ class SparseCrossLinkBlock(nn.Module):
     def forward(self, x):
         '''add forward here'''
 
+        x = self.pconv0(x)
         out1 = self.dconv1(x)
         out2 = self.dconv2(x) # 0.1 or 0.01
         out = out2 * torch.sigmoid(out1) + out1 * torch.sigmoid(out2)
@@ -107,7 +116,7 @@ class CLNET(nn.Module):
                                kernel_size=3,
                                stride=1,
                                padding=1,
-                               groups=1,
+                               groups=32,
                                bias=False)
 
         self.bn2 = nn.BatchNorm2d(32)
@@ -207,12 +216,12 @@ def CLNetV1_C1B2_sw(num_classes):
 
 def CLNetV1_C1B3_sw(num_classes):
     cfg = {
-        'out_channels': [24, 24, 24, 40, 40, 40, 80, 80, 80, 80, 112, 112, 160, 160, 160, 320],
-        'kernel_size': [(5, 3), (3, 5), (5, 5), (3, 3)] * 4,
-        'pool_enable': [False, False, True, False, False, True, False, False, False, False, True, False, True, False, False,
+        'out_channels': [24, 24, 40, 40, 40, 80, 80, 80, 80, 112, 112, 160, 160, 160, 320],
+        'kernel_size': [(3, 5), (5, 5), (3, 3)] + [(5, 3), (3, 5), (5, 5), (3, 3)] * 3,
+        'pool_enable': [False, True, False, False, True, False, False, False, False, True, False, True, False, False,
                         False],
-        'pgroup': [2]*16,
-        'shortcut_enable': [True]*16,
+        'pgroup': [2]*15,
+        'shortcut_enable': [True]*15,
         'dropout_rate': 0.2
     }
     return CLNET(cfg, num_classes=num_classes)
@@ -222,7 +231,7 @@ import torchinfo
 
 
 def test():
-    net = CLNetV1_C1B1_sw(10)
+    net = CLNetV1_C1B3_sw(10)
     torchinfo.summary(net, (1, 3, 32, 32))
     x = torch.randn(3, 3, 32, 32, device='cuda')
     y = net(x)
