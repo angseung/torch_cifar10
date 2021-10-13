@@ -73,7 +73,8 @@ class SparseCrossLinkBlock(nn.Module):
 
         out1 = self.dconv1(x)
         out2 = self.dconv2(x)
-        out = out2 * F.softsign(out1) + out1 * F.softsign(out2)
+        out = out2 * F.sigmoid(out1) + out1 * F.sigmoid(out2)
+        out = F.tanh(out)
         out = self.bn(self.pconv1(out))
 
         if self.shortcut_enable:
@@ -211,7 +212,7 @@ def CLNetV1_C1B3_sw(num_classes):
                         False],
         'pgroup': [2]*16,
         'shortcut_enable': [True]*16,
-        'dropout_rate': 0.2
+        'dropout_rate': 0.5
     }
     return CLNET(cfg, num_classes=num_classes)
 
