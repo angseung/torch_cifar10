@@ -73,9 +73,9 @@ class SparseCrossLinkBlock(nn.Module):
         '''add forward here'''
 
         out1 = self.dconv1(x)
-        out2 = self.dconv2(x)
+        out2 = self.dconv2(x) # 0.1 or 0.01
         out = out2 * torch.sigmoid(out1) + out1 * torch.sigmoid(out2)
-        out = torch.tanh(out)
+        # out = shuffle
         out = self.bn(self.pconv1(out))
 
         if self.shortcut_enable:
