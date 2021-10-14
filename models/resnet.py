@@ -179,7 +179,16 @@ class MobileBasicBlockSep(nn.Module):
                                 bias=False
                                 )
 
-        self.pconv1_1 = nn.Conv2d(in_planes,
+        self.dconv1_2 = nn.Conv2d(in_planes,
+                                in_planes,
+                                kernel_size=3,
+                                stride=stride,
+                                padding=1,
+                                groups=in_planes,
+                                bias=False
+                                )
+
+        self.pconv1 = nn.Conv2d(in_planes,
                                 planes,
                                 kernel_size=1,
                                 stride=1,
@@ -189,16 +198,27 @@ class MobileBasicBlockSep(nn.Module):
 
         self.bn1_1 = nn.BatchNorm2d(planes)
 
+        self.bn1_2 = nn.BatchNorm2d(planes)
+
         self.dconv2_1 = nn.Conv2d(planes,
                                 planes,
                                 kernel_size=3,
                                 stride=1,
-                                padding='same',
-                                groups=in_planes,
+                                padding=1,
+                                groups=planes,
                                 bias=False
                                 )
 
-        self.pconv2_1 = nn.Conv2d(planes,
+        self.dconv2_2 = nn.Conv2d(planes,
+                                planes,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1,
+                                groups=planes,
+                                bias=False
+                                )
+
+        self.pconv2 = nn.Conv2d(planes,
                                 planes,
                                 kernel_size=1,
                                 stride=1,
@@ -207,6 +227,50 @@ class MobileBasicBlockSep(nn.Module):
                                 bias=False)
 
         self.bn2_1 = nn.BatchNorm2d(planes)
+
+        self.bn2_2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out1 = self.bn1_1(self.dconv1_1(0.5 * x))
+        out2 = self.bn1_2(self.dconv1_2(0.5 * x))
+
+        out = self.pconv1(out1 + out2)
+
+        out = torch.relu(out)
+
+        out1 = self.bn2_1(self.dconv2_1(0.5 * out))
+        out2 = self.bn2_2(self.dconv2_2(0.5 * out))
+
+        out = self.pconv2(out1 + out2)
+
+        out = torch.relu(out + self.shortcut(x))
+
+        return out
+
+
+class MobileBasicBlockComb(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(MobileBasicBlockComb, self).__init__()
+
+        self.dconv1_1 = nn.Conv2d(in_planes,
+                                in_planes,
+                                kernel_size=3,
+                                stride=stride,
+                                padding=1,
+                                groups=in_planes,
+                                bias=False
+                                )
 
         self.dconv1_2 = nn.Conv2d(in_planes,
                                 in_planes,
@@ -217,7 +281,7 @@ class MobileBasicBlockSep(nn.Module):
                                 bias=False
                                 )
 
-        self.pconv1_2 = nn.Conv2d(in_planes,
+        self.pconv1 = nn.Conv2d(in_planes,
                                 planes,
                                 kernel_size=1,
                                 stride=1,
@@ -225,18 +289,27 @@ class MobileBasicBlockSep(nn.Module):
                                 groups=1,
                                 bias=False)
 
-        self.bn1_2 = nn.BatchNorm2d(planes)
+        self.bn1 = nn.BatchNorm2d(planes)
+
+        self.dconv2_1 = nn.Conv2d(planes,
+                                planes,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1,
+                                groups=planes,
+                                bias=False
+                                )
 
         self.dconv2_2 = nn.Conv2d(planes,
                                 planes,
                                 kernel_size=3,
                                 stride=1,
-                                padding='same',
-                                groups=in_planes,
+                                padding=1,
+                                groups=planes,
                                 bias=False
                                 )
 
-        self.pconv2_2 = nn.Conv2d(planes,
+        self.pconv2 = nn.Conv2d(planes,
                                 planes,
                                 kernel_size=1,
                                 stride=1,
@@ -244,8 +317,7 @@ class MobileBasicBlockSep(nn.Module):
                                 groups=1,
                                 bias=False)
 
-        self.bn2_2 = nn.BatchNorm2d(planes)
-
+        self.bn2 = nn.BatchNorm2d(planes)
 
         self.shortcut = nn.Sequential()
 
@@ -258,127 +330,18 @@ class MobileBasicBlockSep(nn.Module):
 
     def forward(self, x):
         out1 = self.dconv1_1(0.5 * x)
-        out1 = self.bn1_1(self.pconv1_1(out1))
-
         out2 = self.dconv1_2(0.5 * x)
-        out2 = self.bn1_2(self.pconv1_2(out2))
 
-        out = torch.relu(out1 + out2)
+        out = self.bn1(self.pconv1(out1 + out2))
+
+        out = torch.relu(out)
 
         out1 = self.dconv2_1(0.5 * out)
-        out1 = self.bn2_1(self.pconv2_1(out1))
-
         out2 = self.dconv2_2(0.5 * out)
-        out2 = self.bn2_2(self.pconv2_2(out2))
 
-        out = torch.relu(out1 + out2 + self.shortcut(x))
+        out = self.bn2(self.pconv2(out1 + out2))
 
-        return out
-
-
-class MobileBasicBlockComb(nn.Module):
-    expansion = 1
-
-    def __init__(self, in_planes, planes, stride=1):
-        super(MobileBasicBlockComb, self).__init__()
-
-        self.dconv1_1 = nn.Conv2d(in_planes,
-                                  in_planes,
-                                  kernel_size=3,
-                                  stride=stride,
-                                  padding=1,
-                                  groups=in_planes,
-                                  bias=False
-                                  )
-
-        self.pconv1_1 = nn.Conv2d(in_planes,
-                                  planes,
-                                  kernel_size=1,
-                                  stride=1,
-                                  padding=0,
-                                  groups=1,
-                                  bias=False)
-
-        self.bn1 = nn.BatchNorm2d(planes)
-
-        self.dconv2_1 = nn.Conv2d(planes,
-                                  planes,
-                                  kernel_size=3,
-                                  stride=1,
-                                  padding='same',
-                                  groups=in_planes,
-                                  bias=False
-                                  )
-
-        self.pconv2_1 = nn.Conv2d(planes,
-                                  planes,
-                                  kernel_size=1,
-                                  stride=1,
-                                  padding=0,
-                                  groups=1,
-                                  bias=False)
-
-        self.bn2 = nn.BatchNorm2d(planes)
-
-        self.dconv1_2 = nn.Conv2d(in_planes,
-                                  in_planes,
-                                  kernel_size=3,
-                                  stride=stride,
-                                  padding=1,
-                                  groups=in_planes,
-                                  bias=False
-                                  )
-
-        self.pconv1_2 = nn.Conv2d(in_planes,
-                                  planes,
-                                  kernel_size=1,
-                                  stride=1,
-                                  padding=0,
-                                  groups=1,
-                                  bias=False)
-
-        self.dconv2_2 = nn.Conv2d(planes,
-                                  planes,
-                                  kernel_size=3,
-                                  stride=1,
-                                  padding='same',
-                                  groups=in_planes,
-                                  bias=False
-                                  )
-
-        self.pconv2_2 = nn.Conv2d(planes,
-                                  planes,
-                                  kernel_size=1,
-                                  stride=1,
-                                  padding=0,
-                                  groups=1,
-                                  bias=False)
-
-        self.shortcut = nn.Sequential()
-
-        if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, self.expansion * planes,
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(self.expansion * planes)
-            )
-
-    def forward(self, x):
-        out1 = self.dconv1_1(0.5 * x)
-        out1 = self.pconv1_1(out1)
-
-        out2 = self.dconv1_2(0.5 * x)
-        out2 = self.pconv1_2(out2)
-
-        out = torch.relu(self.bn1(out1 + out2))
-
-        out1 = self.dconv2_1(0.5 * out)
-        out1 = self.pconv2_1(out1)
-
-        out2 = self.dconv2_2(0.5 * out)
-        out2 = self.pconv2_2(out2)
-
-        out = torch.relu(self.bn2(out1 + out2) + self.shortcut(x))
+        out = torch.relu(out + self.shortcut(x))
 
         return out
 
