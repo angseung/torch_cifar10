@@ -45,14 +45,46 @@ class CrossBasicBlock(nn.Module):
 
     def __init__(self, in_planes, planes, stride=1):
         super(CrossBasicBlock, self).__init__()
-        self.conv1 = nn.Conv2d(
-            in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+
+        self.dconv1_1 = nn.Conv2d(
+            in_planes, planes,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=in_planes,
+            bias=False)
+
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
-                               stride=1, padding=1, bias=False)
+
+        self.dconv1_2 = nn.Conv2d(
+            in_planes, planes,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=in_planes,
+            bias=False)
+
+        self.dconv2_1 = nn.Conv2d(
+            planes, planes,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            groups=planes,
+            bias=False)
+
+        self.dconv2_2 = nn.Conv2d(
+            planes, planes,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            groups=planes,
+            bias=False)
+
         self.bn2 = nn.BatchNorm2d(planes)
 
+
         self.shortcut = nn.Sequential()
+
         if stride != 1 or in_planes != self.expansion*planes:
             self.shortcut = nn.Sequential(
                 nn.Conv2d(in_planes, self.expansion*planes,
@@ -61,10 +93,15 @@ class CrossBasicBlock(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.bn2(self.conv2(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
+        out = torch.sigmoid(0.5 * self.dconv1_1(x)) + torch.sigmoid(0.5 * self.dconv1_2(x))
+        out = self.bn1(out)
+        out = torch.relu(out)
+
+        out = torch.sigmoid(0.5 * self.dconv2_1(out)) + torch.sigmoid(0.5 * self.dconv2_2(out))
+        out = self.bn2(out)
+
+        out = torch.relu(self.shortcut(x) + out)
+
         return out
 
 
