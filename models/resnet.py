@@ -773,8 +773,8 @@ class ResNet(nn.Module):
         return out
 
 
-def ResNet18():
-    return ResNet(MobileBasicBlockComb, [2, 2, 2, 2])
+def ResNet18(block='BasicBlock'):
+    return ResNet(block, [2, 2, 2, 2])
 
 
 def ResNet34():
