@@ -349,7 +349,7 @@ class MobileBasicBlockSepMish(nn.Module):
     expansion = 1
 
     def __init__(self, in_planes, planes, stride=1):
-        super(MobileBasicBlockSep, self).__init__()
+        super(MobileBasicBlockSepMish, self).__init__()
 
         self.dconv1_1 = nn.Conv2d(in_planes,
                                 in_planes,
@@ -442,7 +442,7 @@ class MobileBasicBlockCombMish(nn.Module):
     expansion = 1
 
     def __init__(self, in_planes, planes, stride=1):
-        super(MobileBasicBlockComb, self).__init__()
+        super(MobileBasicBlockCombMish, self).__init__()
 
         self.dconv1_1 = nn.Conv2d(in_planes,
                                 in_planes,
@@ -530,7 +530,7 @@ class MobileBasicBlockSepSwish(nn.Module):
     expansion = 1
 
     def __init__(self, in_planes, planes, stride=1):
-        super(MobileBasicBlockSep, self).__init__()
+        super(MobileBasicBlockSepSwish, self).__init__()
 
         self.dconv1_1 = nn.Conv2d(in_planes,
                                 in_planes,
@@ -623,7 +623,7 @@ class MobileBasicBlockCombSwish(nn.Module):
     expansion = 1
 
     def __init__(self, in_planes, planes, stride=1):
-        super(MobileBasicBlockComb, self).__init__()
+        super(MobileBasicBlockCombSwish, self).__init__()
 
         self.dconv1_1 = nn.Conv2d(in_planes,
                                 in_planes,
@@ -773,8 +773,8 @@ class ResNet(nn.Module):
         return out
 
 
-def ResNet18(block='BasicBlock'):
-    return ResNet(block, [2, 2, 2, 2])
+def ResNet18():
+    return ResNet(MobileBasicBlockSepSwish, [2, 2, 2, 2])
 
 
 def ResNet34():
