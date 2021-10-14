@@ -19,6 +19,15 @@ from models.clnet import CLNet_V0
 from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw, CLNetV1_C1B3_sw
 from utils import progress_bar
 import time
+import random
+
+random_seed = 1
+torch.manual_seed(random_seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+random.seed(random_seed)
+torch.cuda.manual_seed(random_seed)
+torch.cuda.manual_seed_all(random_seed) # multi-GPU
 
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -49,7 +58,7 @@ transform_test = transforms.Compose([
 trainset = torchvision.datasets.CIFAR10(
     root='./data', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=128, shuffle=True, num_workers=0)
+    trainset, batch_size=256, shuffle=True, num_workers=0)
 
 testset = torchvision.datasets.CIFAR10(
     root='./data', train=False, download=True, transform=transform_test)
@@ -62,7 +71,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer',
 # Model
 print('==> Building model..')
 # net = VGG('VGG19')
-# net = ResNet18()
+net = ResNet18()
 # net = PreActResNet18()
 # net = GoogLeNet()
 # net = DenseNet121()
@@ -81,7 +90,7 @@ print('==> Building model..')
 # net = CLNet_V12_bn(10)
 # net = CLNetV1_C1B1_sw(10)
 # net = CLNetV1_C1B2_sw(10)
-net = CLNetV1_C1B3_sw(10)
+# net = CLNetV1_C1B3_sw(10)
 
 netkey = net.__class__.__name__
 net = net.to(device)
@@ -182,7 +191,7 @@ optimizer = optim.Adam(net.parameters(), lr=0.0025)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
-for epoch in range(start_epoch, start_epoch+200):
+for epoch in range(start_epoch, start_epoch+30):
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
     scheduler.step()

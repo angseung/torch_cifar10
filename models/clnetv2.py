@@ -73,7 +73,7 @@ class SparseCrossLinkBlock(nn.Module):
 
         out1 = self.dconv1(x)
         out2 = self.dconv2(x)
-        out = out2 * F.softsign(out1) + out1 * F.softsign(out2)
+        out = out2 * torch.sigmoid(out1) + out1 * torch.sigmoid(out2)
         out = self.bn(self.pconv1(out))
 
         if self.shortcut_enable:
