@@ -9,6 +9,7 @@ Reference:
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchinfo
 
 
 class BasicBlock(nn.Module):
@@ -133,7 +134,7 @@ class ResNet(nn.Module):
 
 
 def ResNet18():
-    return ResNet(BasicBlock, [2, 2, 2, 2])
+    return ResNet(CrossBasicBlock, [2, 2, 2, 2])
 
 
 def ResNet34():
@@ -154,7 +155,10 @@ def ResNet152():
 
 def test():
     net = ResNet18()
+    torchinfo.summary(net, (1, 3, 32, 32))
     y = net(torch.randn(1, 3, 32, 32))
     print(y.size())
 
 # test()
+if __name__ == '__main__':
+    test()
