@@ -20,12 +20,14 @@ from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw, CLNetV1_C1B3_sw
 from utils import progress_bar
 import time
 import random
+import numpy as np
 
 random_seed = 1
 torch.manual_seed(random_seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 random.seed(random_seed)
+np.random.seed(random_seed)
 torch.cuda.manual_seed(random_seed)
 torch.cuda.manual_seed_all(random_seed) # multi-GPU
 
@@ -92,11 +94,14 @@ net = ResNet18()
 # net = CLNetV1_C1B2_sw(10)
 # net = CLNetV1_C1B3_sw(10)
 
+max_epoch = 30
+
 netkey = net.__class__.__name__
+device = torch.device("cuda:0")
 net = net.to(device)
-if device == 'cuda':
-    net = torch.nn.DataParallel(net)
-    cudnn.benchmark = True
+# if device == 'cuda':
+#     net = torch.nn.DataParallel(net)
+#     cudnn.benchmark = True
 
 if args.resume:
     # Load checkpoint.
@@ -189,9 +194,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=1e-3)
 optimizer = optim.Adam(net.parameters(), lr=0.0025)
 # optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.5, 0.999), weight_decay=5e-4)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
-for epoch in range(start_epoch, start_epoch+30):
+for epoch in range(start_epoch, start_epoch+max_epoch):
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
     scheduler.step()

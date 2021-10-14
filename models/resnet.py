@@ -40,6 +40,130 @@ class BasicBlock(nn.Module):
         return out
 
 
+class SwishBasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(SwishBasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(
+            in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
+                               stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out = F.silu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.silu(out)
+        return out
+
+
+class MishBasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(MishBasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(
+            in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
+                               stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out = F.mish(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.mish(out)
+        return out
+
+
+class MobileBasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(MobileBasicBlock, self).__init__()
+
+        self.dconv1 = nn.Conv2d(in_planes,
+                                in_planes,
+                                kernel_size=3,
+                                stride=stride,
+                                padding=1,
+                                groups=in_planes,
+                                bias=False
+                                )
+
+        self.pconv1 = nn.Conv2d(in_planes,
+                                planes,
+                                kernel_size=1,
+                                stride=1,
+                                padding=0,
+                                groups=1,
+                                bias=False)
+
+        self.bn1 = nn.BatchNorm2d(planes)
+
+        self.dconv2 = nn.Conv2d(planes,
+                                planes,
+                                kernel_size=3,
+                                stride=1,
+                                padding='same',
+                                groups=in_planes,
+                                bias=False
+                                )
+
+        self.pconv2 = nn.Conv2d(planes,
+                                planes,
+                                kernel_size=1,
+                                stride=1,
+                                padding=0,
+                                groups=1,
+                                bias=False)
+
+        self.bn2 = nn.BatchNorm2d(planes)
+
+
+        self.shortcut = nn.Sequential()
+
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out = self.dconv1(x)
+        out = self.pconv1(out)
+        out = torch.relu(self.bn1(out))
+
+        out = self.dconv2(out)
+        out = self.pconv2(out)
+        out = torch.relu(self.bn2(out))
+
+        out += self.shortcut(x)
+        out = torch.relu(out)
+
+        return out
+
 class CrossBasicBlock(nn.Module):
     expansion = 1
 
@@ -171,7 +295,7 @@ class ResNet(nn.Module):
 
 
 def ResNet18():
-    return ResNet(CrossBasicBlock, [2, 2, 2, 2])
+    return ResNet(MobileBasicBlock, [2, 2, 2, 2])
 
 
 def ResNet34():
