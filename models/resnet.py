@@ -196,9 +196,9 @@ class MobileBasicBlockSep(nn.Module):
                                 groups=1,
                                 bias=False)
 
-        self.bn1_1 = nn.BatchNorm2d(planes)
+        self.bn1_1 = nn.BatchNorm2d(in_planes)
 
-        self.bn1_2 = nn.BatchNorm2d(planes)
+        self.bn1_2 = nn.BatchNorm2d(in_planes)
 
         self.dconv2_1 = nn.Conv2d(planes,
                                 planes,
@@ -412,7 +412,7 @@ class ResNet(nn.Module):
 
 
 def ResNet18():
-    return ResNet(MobileBasicBlockSep, [2, 2, 2, 2])
+    return ResNet(MobileBasicBlockComb, [2, 2, 2, 2])
 
 
 def ResNet34():
