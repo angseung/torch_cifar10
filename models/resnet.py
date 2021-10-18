@@ -774,7 +774,7 @@ class ResNet(nn.Module):
 
 
 def ResNet18():
-    return ResNet(MobileBasicBlockSepSwish, [2, 2, 2, 2])
+    return ResNet(MobileBasicBlockCombSwish, [2, 2, 2, 2])
 
 
 def ResNet34():

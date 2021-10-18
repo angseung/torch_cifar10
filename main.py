@@ -94,7 +94,7 @@ net = ResNet18()
 # net = CLNetV1_C1B2_sw(10)
 # net = CLNetV1_C1B3_sw(10)
 
-max_epoch = 30
+max_epoch = 200
 
 netkey = net.__class__.__name__
 device = torch.device("cuda:0")
