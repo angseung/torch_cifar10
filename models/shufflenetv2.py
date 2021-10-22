@@ -5,6 +5,7 @@ See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architectur
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchinfo
 
 
 class ShuffleBlock(nn.Module):
@@ -154,6 +155,7 @@ configs = {
 
 def test():
     net = ShuffleNetV2(net_size=0.5)
+    torchinfo.summary(net, (1, 3, 224, 224))
     x = torch.randn(3, 3, 32, 32)
     y = net(x)
     print(y.shape)

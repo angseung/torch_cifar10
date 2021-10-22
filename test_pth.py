@@ -13,14 +13,15 @@ from torchinfo import summary
 import os
 import argparse
 
-# from models import *
-# from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
-# from models.clnet import CLNet_V0
-from models.clnetv2 import CLNetV1_C1B3_sw
+from models import *
+from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
+from models.clnet import CLNet_V0
+from models.clnetv2 import CLNetV1_C1B1_sw, CLNetV1_C1B2_sw, CLNetV1_C1B3_sw
 from utils import progress_bar
 import time
 import random
 import numpy as np
+from matplotlib import pyplot as plt
 
 random_seed = 1
 torch.manual_seed(random_seed)
@@ -70,10 +71,22 @@ testloader = torch.utils.data.DataLoader(
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
 
+def custom_imshow(img):
+    img = img.numpy()
+    plt.imshow(np.transpose(img, (1, 2, 0)))
+    plt.show()
+
+def process():
+    for batch_idx, (inputs, targets) in enumerate(trainloader):
+        custom_imshow(inputs[0])
+
+
+process()
+
 # Model
 print('==> Building model..')
 # net = VGG('VGG19')
-# net = ResNet18()
+net = ResNet18()
 # net = PreActResNet18()
 # net = GoogLeNet()
 # net = DenseNet121()
@@ -92,7 +105,7 @@ print('==> Building model..')
 # net = CLNet_V12_bn(10)
 # net = CLNetV1_C1B1_sw(10)
 # net = CLNetV1_C1B2_sw(10)
-net = CLNetV1_C1B3_sw(10)
+# net = CLNetV1_C1B3_sw(10)
 
 max_epoch = 200
 

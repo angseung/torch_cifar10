@@ -7,6 +7,7 @@ Reference: https://github.com/keras-team/keras-applications/blob/master/keras_ap
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchinfo
 
 
 def swish(x):
@@ -105,7 +106,7 @@ class Block(nn.Module):
 
 
 class EfficientNet(nn.Module):
-    def __init__(self, cfg, num_classes=10):
+    def __init__(self, cfg, num_classes=1000):
         super(EfficientNet, self).__init__()
         self.cfg = cfg
         self.conv1 = nn.Conv2d(3,
@@ -166,9 +167,16 @@ def EfficientNetB0():
 
 def test():
     net = EfficientNetB0()
-    x = torch.randn(2, 3, 32, 32)
+    net.to("cuda:0")
+    with open('../log.ext', 'w') as f:
+        m_info = torchinfo.summary(net, (1, 3, 224, 224), verbose=0)
+        f.write('%s\n\n' % m_info)
+
+    # torchinfo.summary(net, (1, 3, 224, 224))
+    x = torch.randn(2, 3, 224, 224)
+    x = x.to("cuda:0")
     y = net(x)
-    print(y.shape)
+    print(net)
 
 
 if __name__ == '__main__':

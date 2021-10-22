@@ -5,6 +5,7 @@ See the paper "ShuffleNet: An Extremely Efficient Convolutional Neural Network f
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchinfo
 
 
 class ShuffleBlock(nn.Module):
@@ -102,8 +103,9 @@ def ShuffleNetG3():
 
 def test():
     net = ShuffleNetG2()
+    torchinfo.summary(net, (1, 3, 224, 224))
     x = torch.randn(1,3,32,32)
     y = net(x)
     print(y)
 
-# test()
+test()
