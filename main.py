@@ -37,7 +37,8 @@ parser.add_argument('--resume', '-r', action='store_true',
                     help='resume from checkpoint')
 args = parser.parse_args()
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = "mps"
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
@@ -93,7 +94,7 @@ print('==> Building model..')
 net = CLNetV1_C1B3_sw(10)
 
 netkey = net.__class__.__name__
-net = net.to(device)
+# net = net.to("mps")
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
@@ -194,6 +195,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoc
 
 
 for epoch in range(start_epoch, start_epoch + max_epoch):
+    net = net.to("mps")
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
     scheduler.step()
