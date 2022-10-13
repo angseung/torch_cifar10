@@ -195,7 +195,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoc
 
 
 for epoch in range(start_epoch, start_epoch + max_epoch):
-    net = net.to("mps")
+    net = net.to(device)
     train(epoch, netkey, timestr)
     test(epoch, netkey, timestr)
     scheduler.step()
