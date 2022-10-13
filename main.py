@@ -12,6 +12,7 @@ from torchinfo import summary
 
 import os
 import argparse
+import platform
 
 from models import *
 from models.clnet_sw import CLNet_V10, CLNet_V11, CLNet_V12_bn
@@ -37,8 +38,14 @@ parser.add_argument('--resume', '-r', action='store_true',
                     help='resume from checkpoint')
 args = parser.parse_args()
 
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-device = "mps"
+curr_os = platform.system()
+print("Current OS : %s" % curr_os)
+
+if "Windows" in curr_os:
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+elif "Darwin" in curr_os:
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
+
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
