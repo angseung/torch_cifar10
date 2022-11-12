@@ -1,6 +1,6 @@
-'''
+"""
 CrossLink Network
-'''
+"""
 
 import torch
 import torch.nn as nn
@@ -32,7 +32,7 @@ def channel_shuffle(x, groups):
 
 
 class CrossLinkBlock(nn.Module):
-    '''Cross-Link Block'''
+    """Cross-Link Block"""
 
     def __init__(self, in_channels, out_channels, kernel_size, group_size, pool_enable):
         super(CrossLinkBlock, self).__init__()
@@ -41,46 +41,54 @@ class CrossLinkBlock(nn.Module):
         self.group_size = group_size
 
         # basic blocks
-        self.dconv1_1 = nn.Conv2d(in_channels,
-                                  in_channels,
-                                  kernel_size=kernel_size[0],
-                                  stride=1,
-                                  padding='same',
-                                  groups=in_channels,
-                                  bias=False)
+        self.dconv1_1 = nn.Conv2d(
+            in_channels,
+            in_channels,
+            kernel_size=kernel_size[0],
+            stride=1,
+            padding="same",
+            groups=in_channels,
+            bias=False,
+        )
 
-        self.dconv1_2 = nn.Conv2d(out_channels,
-                                  out_channels,
-                                  kernel_size=kernel_size[1],
-                                  stride=1,
-                                  padding='same',
-                                  groups=out_channels,
-                                  bias=False)
+        self.dconv1_2 = nn.Conv2d(
+            out_channels,
+            out_channels,
+            kernel_size=kernel_size[1],
+            stride=1,
+            padding="same",
+            groups=out_channels,
+            bias=False,
+        )
 
         self.bn1 = nn.BatchNorm2d(out_channels)
 
-        self.pconv1_1 = nn.Conv2d(in_channels,
-                               out_channels,
-                               kernel_size=1,
-                               stride=1,
-                               padding='same',
-                               groups=group_size,
-                               bias=False)
+        self.pconv1_1 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=1,
+            stride=1,
+            padding="same",
+            groups=group_size,
+            bias=False,
+        )
 
-        self.pconv1_2 = nn.Conv2d(in_channels,
-                               out_channels,
-                               kernel_size=1,
-                               stride=1,
-                               padding='same',
-                               groups=group_size,
-                               bias=False)
+        self.pconv1_2 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=1,
+            stride=1,
+            padding="same",
+            groups=group_size,
+            bias=False,
+        )
 
         self.activation = ReLU()
 
         self.maxpool = nn.MaxPool2d(2, 2)
 
     def forward(self, x):
-        '''add forward here'''
+        """add forward here"""
 
         out1 = self.dconv1_1(x)
         out2 = channel_shuffle(x, self.group_size)
@@ -103,7 +111,7 @@ class CrossLinkBlock(nn.Module):
 
 
 class CrossLinkBlock_bn(nn.Module):
-    '''Cross-Link Block'''
+    """Cross-Link Block"""
 
     def __init__(self, in_channels, out_channels, kernel_size, group_size, pool_enable):
         super(CrossLinkBlock_bn, self).__init__()
@@ -112,21 +120,25 @@ class CrossLinkBlock_bn(nn.Module):
         self.group_size = group_size
 
         # basic blocks
-        self.dconv1_1 = nn.Conv2d(in_channels,
-                                  in_channels,
-                                  kernel_size=kernel_size[0],
-                                  stride=1,
-                                  padding='same',
-                                  groups=in_channels,
-                                  bias=False)
+        self.dconv1_1 = nn.Conv2d(
+            in_channels,
+            in_channels,
+            kernel_size=kernel_size[0],
+            stride=1,
+            padding="same",
+            groups=in_channels,
+            bias=False,
+        )
 
-        self.dconv1_2 = nn.Conv2d(out_channels,
-                                  out_channels,
-                                  kernel_size=kernel_size[1],
-                                  stride=1,
-                                  padding='same',
-                                  groups=out_channels,
-                                  bias=False)
+        self.dconv1_2 = nn.Conv2d(
+            out_channels,
+            out_channels,
+            kernel_size=kernel_size[1],
+            stride=1,
+            padding="same",
+            groups=out_channels,
+            bias=False,
+        )
 
         self.bn1 = nn.BatchNorm2d(in_channels)
 
@@ -134,28 +146,32 @@ class CrossLinkBlock_bn(nn.Module):
 
         self.bn3 = nn.BatchNorm2d(out_channels)
 
-        self.pconv1_1 = nn.Conv2d(in_channels,
-                               out_channels,
-                               kernel_size=1,
-                               stride=1,
-                               padding='same',
-                               groups=group_size,
-                               bias=False)
+        self.pconv1_1 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=1,
+            stride=1,
+            padding="same",
+            groups=group_size,
+            bias=False,
+        )
 
-        self.pconv1_2 = nn.Conv2d(in_channels,
-                               out_channels,
-                               kernel_size=1,
-                               stride=1,
-                               padding='same',
-                               groups=group_size,
-                               bias=False)
+        self.pconv1_2 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=1,
+            stride=1,
+            padding="same",
+            groups=group_size,
+            bias=False,
+        )
 
         self.activation = ReLU()
 
         self.maxpool = nn.MaxPool2d(2, 2)
 
     def forward(self, x):
-        '''add forward here'''
+        """add forward here"""
 
         out1 = self.dconv1_1(x)
         out2 = channel_shuffle(x, self.group_size)
@@ -182,48 +198,35 @@ class CLNET(nn.Module):
         super(CLNET, self).__init__()
         self.cfg = cfg
 
-        self.conv1 = nn.Conv2d(3,
-                               32,
-                               kernel_size=3,
-                               stride=1,
-                               padding=1,
-                               bias=False)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
 
         self.bn1 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(2, 2)
 
-        self.conv2 = nn.Conv2d(32,
-                               32,
-                               kernel_size=3,
-                               stride=1,
-                               padding=1,
-                               groups=1,
-                               bias=False)
+        self.conv2 = nn.Conv2d(
+            32, 32, kernel_size=3, stride=1, padding=1, groups=1, bias=False
+        )
 
         self.bn2 = nn.BatchNorm2d(32)
 
-        self.conv3 = nn.Conv2d(32,
-                               16,
-                               kernel_size=1,
-                               stride=1,
-                               padding=0,
-                               bias=False)
+        self.conv3 = nn.Conv2d(32, 16, kernel_size=1, stride=1, padding=0, bias=False)
 
         self.layers = self._make_layers(in_channels=16)
-        self.linear = nn.Linear(cfg['out_channels'][-1], num_classes)
+        self.linear = nn.Linear(cfg["out_channels"][-1], num_classes)
 
     def _make_layers(self, in_channels):
         layers = []
-        cfg = [self.cfg[k] for k in ['out_channels', 'kernel_size', 'pool_enable', 'group_size']]
-
+        cfg = [
+            self.cfg[k]
+            for k in ["out_channels", "kernel_size", "pool_enable", "group_size"]
+        ]
 
         for out_channels, kernel_size, pool_enable, group_size in zip(*cfg):
             layers.append(
-                CrossLinkBlock(in_channels,
-                               out_channels,
-                               kernel_size,
-                               group_size,
-                               pool_enable))
+                CrossLinkBlock(
+                    in_channels, out_channels, kernel_size, group_size, pool_enable
+                )
+            )
             in_channels = out_channels
         return nn.Sequential(*layers)
 
@@ -233,7 +236,7 @@ class CLNET(nn.Module):
         out = self.layers(out)
         out = F.adaptive_avg_pool2d(out, 1)
         out = out.view(out.size(0), -1)
-        dropout_rate = self.cfg['dropout_rate']
+        dropout_rate = self.cfg["dropout_rate"]
         if self.training and dropout_rate > 0:
             out = F.dropout(out, p=dropout_rate)
         out = self.linear(out)
@@ -245,48 +248,35 @@ class CLNET_bn(nn.Module):
         super(CLNET_bn, self).__init__()
         self.cfg = cfg
 
-        self.conv1 = nn.Conv2d(3,
-                               32,
-                               kernel_size=3,
-                               stride=1,
-                               padding=1,
-                               bias=False)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
 
         self.bn1 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(2, 2)
 
-        self.conv2 = nn.Conv2d(32,
-                               32,
-                               kernel_size=3,
-                               stride=1,
-                               padding=1,
-                               groups=1,
-                               bias=False)
+        self.conv2 = nn.Conv2d(
+            32, 32, kernel_size=3, stride=1, padding=1, groups=1, bias=False
+        )
 
         self.bn2 = nn.BatchNorm2d(32)
 
-        self.conv3 = nn.Conv2d(32,
-                               16,
-                               kernel_size=1,
-                               stride=1,
-                               padding=0,
-                               bias=False)
+        self.conv3 = nn.Conv2d(32, 16, kernel_size=1, stride=1, padding=0, bias=False)
 
         self.layers = self._make_layers(in_channels=16)
-        self.linear = nn.Linear(cfg['out_channels'][-1], num_classes)
+        self.linear = nn.Linear(cfg["out_channels"][-1], num_classes)
 
     def _make_layers(self, in_channels):
         layers = []
-        cfg = [self.cfg[k] for k in ['out_channels', 'kernel_size', 'pool_enable', 'group_size']]
-
+        cfg = [
+            self.cfg[k]
+            for k in ["out_channels", "kernel_size", "pool_enable", "group_size"]
+        ]
 
         for out_channels, kernel_size, pool_enable, group_size in zip(*cfg):
             layers.append(
-                CrossLinkBlock_bn(in_channels,
-                               out_channels,
-                               kernel_size,
-                               group_size,
-                               pool_enable))
+                CrossLinkBlock_bn(
+                    in_channels, out_channels, kernel_size, group_size, pool_enable
+                )
+            )
             in_channels = out_channels
         return nn.Sequential(*layers)
 
@@ -296,7 +286,7 @@ class CLNET_bn(nn.Module):
         out = self.layers(out)
         out = F.adaptive_avg_pool2d(out, 1)
         out = out.view(out.size(0), -1)
-        dropout_rate = self.cfg['dropout_rate']
+        dropout_rate = self.cfg["dropout_rate"]
         if self.training and dropout_rate > 0:
             out = F.dropout(out, p=dropout_rate)
         out = self.linear(out)
@@ -305,57 +295,186 @@ class CLNET_bn(nn.Module):
 
 def CLNet_V10(num_classes):
     cfg = {
-        'out_channels': [24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
-        'kernel_size': [(3, 5), (5, 5), (5, 3), (3, 3), (3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3)],
-        'pool_enable': [True, False, True, False, False, False, True, True, False, False],
-        'dropout_rate': 0.2,
-        'group_size' : [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        "out_channels": [24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
+        "kernel_size": [
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+            (3, 3),
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+        ],
+        "pool_enable": [
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            True,
+            True,
+            False,
+            False,
+        ],
+        "dropout_rate": 0.2,
+        "group_size": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     }
     return CLNET(cfg, num_classes=num_classes)
 
 
 def CLNet_V11(num_classes):
     cfg = {
-        'out_channels': [24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
-        'kernel_size': [(3, 3), (3, 5), (5, 5), (5, 3), (3, 3), (3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3)],
-        'pool_enable': [False, True, False, True, False, False, False, True, True, False, False],
-        'dropout_rate': 0.2,
-        'group_size' : [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        "out_channels": [24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
+        "kernel_size": [
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+            (3, 3),
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+        ],
+        "pool_enable": [
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            True,
+            True,
+            False,
+            False,
+        ],
+        "dropout_rate": 0.2,
+        "group_size": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     }
     return CLNET(cfg, num_classes=num_classes)
 
 
 def CLNet_V11_bn(num_classes):
     cfg = {
-        'out_channels': [24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
-        'kernel_size': [(3, 3), (3, 5), (5, 5), (5, 3), (3, 3), (3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3)],
-        'pool_enable': [False, True, False, True, False, False, False, True, True, False, False],
-        'dropout_rate': 0.2,
-        'group_size' : [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        "out_channels": [24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
+        "kernel_size": [
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+            (3, 3),
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+        ],
+        "pool_enable": [
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            True,
+            True,
+            False,
+            False,
+        ],
+        "dropout_rate": 0.2,
+        "group_size": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     }
     return CLNET_bn(cfg, num_classes=num_classes)
 
 
 def CLNet_V12_bn(num_classes):
     cfg = {
-        'out_channels': [24, 24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
-        'kernel_size': [(3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3), (3, 3), (3, 3), (3, 5), (5, 5), (5, 3), (3, 3)],
-        'pool_enable': [False, False, True, False, True, False, False, False, True, True, False, False],
-        'dropout_rate': 0.2,
-        'group_size' : [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        "out_channels": [24, 24, 24, 40, 40, 80, 80, 80, 112, 160, 160, 320],
+        "kernel_size": [
+            (3, 3),
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+            (3, 3),
+            (3, 3),
+            (3, 5),
+            (5, 5),
+            (5, 3),
+            (3, 3),
+        ],
+        "pool_enable": [
+            False,
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            True,
+            True,
+            False,
+            False,
+        ],
+        "dropout_rate": 0.2,
+        "group_size": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     }
     return CLNET_bn(cfg, num_classes=num_classes)
 
 
 def CLNetV1_C1B3_sw(num_classes):
     cfg = {
-        'out_channels': [24, 24, 24, 40, 40, 40, 80, 80, 80, 80, 112, 112, 160, 160, 160, 320],
-        'kernel_size': [(5, 3), (3, 5), (5, 5), (3, 3)] * 4,
-        'pool_enable': [False, False, True, False, False, True, False, False, False, False, True, False, True, False, False,
-                        False],
-        'group_size': [2]*16,
-        'shortcut_enable': [True]*16,
-        'dropout_rate': 0.5
+        "out_channels": [
+            24,
+            24,
+            24,
+            40,
+            40,
+            40,
+            80,
+            80,
+            80,
+            80,
+            112,
+            112,
+            160,
+            160,
+            160,
+            320,
+        ],
+        "kernel_size": [(5, 3), (3, 5), (5, 5), (3, 3)] * 4,
+        "pool_enable": [
+            False,
+            False,
+            True,
+            False,
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+        ],
+        "group_size": [2] * 16,
+        "shortcut_enable": [True] * 16,
+        "dropout_rate": 0.5,
     }
     return CLNET(cfg, num_classes=num_classes)
 
@@ -366,10 +485,10 @@ import torchinfo
 def test():
     net = CLNetV1_C1B3_sw(10)
     torchinfo.summary(net, (1, 3, 32, 32))
-    x = torch.randn(3, 3, 32, 32, device='cuda')
+    x = torch.randn(3, 3, 32, 32, device="cuda")
     y = net(x)
     print(y.shape)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test()
